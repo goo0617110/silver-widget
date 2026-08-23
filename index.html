@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>銀価格</title>
+
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 60px;
+    }
+
+    .card {
+      max-width: 420px;
+      margin: auto;
+      background: #222;
+      border-radius: 24px;
+      padding: 30px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    #price {
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    #total {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
+    #status {
+      color: #aaa;
+      margin-top: 25px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>🥈 銀価格</h1>
+
+    <div id="price">
+      読み込み中...
+    </div>
+
+    <div id="total"></div>
+
+    <div id="status">
+      銀価格とドル円を取得中
+    </div>
+  </div>
+
+  <script>
+    async function updateSilverPrice() {
+
+      try {
+
+        const silverURL =
+          "https://query1.finance.yahoo.com/v8/finance/chart/SI=F";
+
+        const usdJpyURL =
+          "https://query1.finance.yahoo.com/v8/finance/chart/USDJPY=X";
+
+        const silverResponse = await fetch(silverURL);
+        const usdJpyResponse = await fetch(usdJpyURL);
+
+        const silverData = await silverResponse.json();
+        const usdJpyData = await usdJpyResponse.json();
+
+        const silver =
+          silverData.chart.result[0].meta.regularMarketPrice;
+
+        const usdJpy =
+          usdJpyData.chart.result[0].meta.regularMarketPrice;
+
+        const yenPerGram =
+          (silver / 31.1034768) * usdJpy;
+
+        const total648 =
+          yenPerGram * 648;
+
+        document.getElementById("price").textContent =
+          "¥" + yenPerGram.toFixed(2) + " / g";
+
+        document.getElementById("total").textContent =
+          "648g = ¥" +
+          Math.round(total648).toLocaleString();
+
+        document.getElementById("status").textContent =
+          "銀 $" + silver +
+          " / oz　USD/JPY " + usdJpy;
+
+      } catch (error) {
+
+        document.getElementById("price").textContent =
+          "取得エラー";
+
+        document.getElementById("status").textContent =
+          error.message;
+      }
+    }
+
+    updateSilverPrice();
+  </script>
+
+</body>
+</html>
