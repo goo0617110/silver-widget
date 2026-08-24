@@ -59,58 +59,31 @@
     </div>
   </div>
 
-  <script>
-    async function updateSilverPrice() {
+ <script>
+  async function updateSilverPrice() {
+    try {
+      const response = await fetch("data.json");
+      const data = await response.json();
 
-      try {
+      document.getElementById("price").textContent =
+        "¥" + data.yen_per_gram.toFixed(2) + " / g";
 
-        const silverURL =
-          "https://query1.finance.yahoo.com/v8/finance/chart/SI=F";
+      document.getElementById("total").textContent =
+        "648g = ¥" + data.total_648g.toLocaleString();
 
-        const usdJpyURL =
-          "https://query1.finance.yahoo.com/v8/finance/chart/USDJPY=X";
+      document.getElementById("status").textContent =
+        "銀 $" + data.silver_usd_oz +
+        " / oz　USD/JPY " + data.usd_jpy +
+        "　更新 " + data.updated;
 
-        const silverResponse = await fetch(silverURL);
-        const usdJpyResponse = await fetch(usdJpyURL);
-
-        const silverData = await silverResponse.json();
-        const usdJpyData = await usdJpyResponse.json();
-
-        const silver =
-          silverData.chart.result[0].meta.regularMarketPrice;
-
-        const usdJpy =
-          usdJpyData.chart.result[0].meta.regularMarketPrice;
-
-        const yenPerGram =
-          (silver / 31.1034768) * usdJpy;
-
-        const total648 =
-          yenPerGram * 648;
-
-        document.getElementById("price").textContent =
-          "¥" + yenPerGram.toFixed(2) + " / g";
-
-        document.getElementById("total").textContent =
-          "648g = ¥" +
-          Math.round(total648).toLocaleString();
-
-        document.getElementById("status").textContent =
-          "銀 $" + silver +
-          " / oz　USD/JPY " + usdJpy;
-
-      } catch (error) {
-
-        document.getElementById("price").textContent =
-          "取得エラー";
-
-        document.getElementById("status").textContent =
-          error.message;
-      }
+    } catch (error) {
+      document.getElementById("price").textContent = "取得エラー";
+      document.getElementById("status").textContent = error.message;
     }
+  }
 
-    updateSilverPrice();
-  </script>
+  updateSilverPrice();
+</script>
 
 </body>
 </html>
